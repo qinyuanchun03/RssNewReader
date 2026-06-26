@@ -1,0 +1,6 @@
+{
+  "name": "N-Reader",
+  "description": "An AI-First knowledge reading platform with RSS aggregation, AI summaries, and deep research capabilities.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,69 @@
+{
+  "entities": {
+    "rssSource": {
+      "title": "RSS Source",
+      "description": "An RSS feed source subscribed to by a user.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The UID of the user who owns this source." },
+        "title": { "type": "string" },
+        "url": { "type": "string" },
+        "category": { "type": "string" },
+        "icon": { "type": "string" },
+        "description": { "type": "string" },
+        "enabled": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "url", "title"]
+    },
+    "rssArticle": {
+      "title": "RSS Article",
+      "description": "An article fetched from an RSS source.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The UID of the user." },
+        "sourceId": { "type": "string" },
+        "guid": { "type": "string" },
+        "title": { "type": "string" },
+        "link": { "type": "string" },
+        "author": { "type": "string" },
+        "content": { "type": "string" },
+        "summary": { "type": "string", "description": "AI generated summary." },
+        "publishedAt": { "type": "string", "format": "date-time" },
+        "image": { "type": "string" },
+        "read": { "type": "boolean" },
+        "favorite": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "sourceId", "guid", "title", "link"]
+    },
+    "aiHistory": {
+      "title": "AI History",
+      "description": "History of AI interactions for a specific article.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "articleId": { "type": "string" },
+        "model": { "type": "string" },
+        "prompt": { "type": "string" },
+        "answer": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "articleId", "prompt", "answer"]
+    }
+  },
+  "firestore": {
+    "/rss_sources/{sourceId}": {
+      "schema": "rssSource",
+      "description": "Collection of RSS sources."
+    },
+    "/rss_articles/{articleId}": {
+      "schema": "rssArticle",
+      "description": "Collection of fetched RSS articles."
+    },
+    "/ai_history/{historyId}": {
+      "schema": "aiHistory",
+      "description": "Collection of AI interaction history."
+    }
+  }
+}
