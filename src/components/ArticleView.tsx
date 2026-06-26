@@ -385,7 +385,7 @@ export function ArticleView({
         setNoteTitle("内容剪辑");
       }
     } else {
-      alert("请先在文章里用鼠标圈选一段文本，然后再点击‘剪辑选中文字’按钮！");
+      setNoteContent(prev => prev + (prev ? "" : "💡 温馨提示：用鼠标在左侧文章中圈选一段文本，然后再点击“剪切选中文字”按钮，该内容就会自动导入到这里。"));
     }
   };
 

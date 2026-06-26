@@ -387,11 +387,35 @@ app.get("/api/rss", async (req, res) => {
   }
 
   try {
-    const feed = await parser.parseURL(url);
+    console.log(`Fetching RSS feed via robust fetch: ${url}`);
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/rss+xml,application/atom+xml",
+        "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP fetch failed with status ${response.status}: ${response.statusText}`);
+    }
+
+    const xml = await response.text();
+    const feed = await parser.parseString(xml);
     res.json(feed);
-  } catch (error) {
-    console.error("RSS Fetch Error:", error);
-    res.status(500).json({ error: "Failed to fetch RSS feed" });
+  } catch (error: any) {
+    console.warn("Robust RSS fetch/parse failed, trying fallback standard parseURL:", error);
+    try {
+      const feed = await parser.parseURL(url);
+      res.json(feed);
+    } catch (fallbackError: any) {
+      console.error("All RSS parsing attempts failed:", fallbackError);
+      res.status(500).json({ 
+        error: `Failed to fetch and parse RSS feed. Ensure the URL is a valid RSS XML link. (${fallbackError.message || fallbackError})` 
+      });
+    }
   }
 });
 

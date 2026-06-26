@@ -25,12 +25,14 @@ export function AddSource({ isOpen, onClose, onAdd }: AddSourceProps) {
   const [url, setUrl] = useState("");
   const [category, setCategory] = useState("General");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!url) return;
 
     setIsLoading(true);
+    setError(null);
     try {
       // Fetch source info from backend
       const response = await fetch(`/api/rss?url=${encodeURIComponent(url)}`);
@@ -48,20 +50,26 @@ export function AddSource({ isOpen, onClose, onAdd }: AddSourceProps) {
         };
         onAdd(newSource);
         setUrl("");
+        setError(null);
         onClose();
       } else {
-        alert(data.error || "Failed to add feed");
+        setError(data.error || "Failed to add feed");
       }
-    } catch (error) {
-      console.error("Add source error:", error);
-      alert("Something went wrong");
+    } catch (err) {
+      console.error("Add source error:", err);
+      setError("Failed to fetch RSS. Please verify the URL or try again later.");
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleClose = () => {
+    setError(null);
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
@@ -71,13 +79,21 @@ export function AddSource({ isOpen, onClose, onAdd }: AddSourceProps) {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
+            {error && (
+              <div className="p-2.5 text-xs bg-destructive/10 text-destructive rounded-lg border border-destructive/20 leading-normal">
+                ⚠️ {error}
+              </div>
+            )}
             <div className="grid gap-2">
               <Label htmlFor="url">{t("rss.feed_url")}</Label>
               <Input
                 id="url"
                 placeholder="https://example.com/rss"
                 value={url}
-                onChange={(e) => setUrl(e.target.value)}
+                onChange={(e) => {
+                  setUrl(e.target.value);
+                  if (error) setError(null);
+                }}
                 required
               />
             </div>
@@ -92,7 +108,7 @@ export function AddSource({ isOpen, onClose, onAdd }: AddSourceProps) {
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={handleClose}>
               {t("rss.cancel")}
             </Button>
             <Button type="submit" disabled={isLoading}>
