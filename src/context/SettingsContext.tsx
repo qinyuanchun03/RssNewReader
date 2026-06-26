@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 export type Theme = "light" | "dark" | "system";
 export type ReadingWidth = "narrow" | "normal" | "wide" | "full";
-export type AiProvider = "gemini" | "openai" | "anthropic" | "openrouter" | "zenmux";
+export type AiProvider = "gemini" | "openai" | "anthropic" | "openrouter" | "zenmux" | "custom";
 
 interface Settings {
   theme: Theme;
@@ -26,6 +26,9 @@ interface Settings {
   zenmuxApiKey: string;
   zenmuxBaseUrl: string;
   zenmuxModel: string;
+  customApiKey: string;
+  customBaseUrl: string;
+  customModel: string;
 }
 
 interface SettingsContextType {
@@ -53,8 +56,11 @@ const defaultSettings: Settings = {
   openrouterBaseUrl: "https://openrouter.ai/api/v1",
   openrouterModel: "google/gemini-2.5-flash",
   zenmuxApiKey: "",
-  zenmuxBaseUrl: "https://api.zenmux.ai/v1",
+  zenmuxBaseUrl: "https://zenmux.ai/api/v1",
   zenmuxModel: "deepseek-chat",
+  customApiKey: "",
+  customBaseUrl: "https://api.openai.com/v1",
+  customModel: "gpt-4o-mini",
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -62,7 +68,18 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<Settings>(() => {
     const saved = localStorage.getItem("n_reader_settings");
-    return saved ? JSON.parse(saved) : defaultSettings;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.zenmuxBaseUrl === "https://api.zenmux.ai/v1") {
+          parsed.zenmuxBaseUrl = "https://zenmux.ai/api/v1";
+        }
+        return { ...defaultSettings, ...parsed };
+      } catch (e) {
+        return defaultSettings;
+      }
+    }
+    return defaultSettings;
   });
 
   useEffect(() => {

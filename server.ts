@@ -201,6 +201,8 @@ function hasApiKey(req: any): boolean {
       return !!req.headers["x-openrouter-api-key"];
     case "zenmux":
       return !!req.headers["x-zenmux-api-key"];
+    case "custom":
+      return !!req.headers["x-custom-api-key"];
     default:
       return false;
   }
@@ -226,6 +228,10 @@ async function dispatchAI(req: any, systemInstruction: string, userPrompt: strin
   const userZenmuxApiKey = req.headers["x-zenmux-api-key"] as string | undefined;
   const userZenmuxBaseUrl = req.headers["x-zenmux-base-url"] as string | undefined;
   const userZenmuxModel = req.headers["x-zenmux-model"] as string | undefined;
+
+  const userCustomApiKey = req.headers["x-custom-api-key"] as string | undefined;
+  const userCustomBaseUrl = req.headers["x-custom-base-url"] as string | undefined;
+  const userCustomModel = req.headers["x-custom-model"] as string | undefined;
 
   if (aiProvider === "openai") {
     if (!userOpenAiApiKey) throw new Error("Missing OpenAI API Key");
@@ -258,8 +264,17 @@ async function dispatchAI(req: any, systemInstruction: string, userPrompt: strin
     if (!userZenmuxApiKey) throw new Error("Missing Zenmux API Key");
     return callOpenAiCompatible({
       apiKey: userZenmuxApiKey,
-      baseUrl: userZenmuxBaseUrl || "https://api.zenmux.ai/v1",
+      baseUrl: userZenmuxBaseUrl || "https://zenmux.ai/api/v1",
       model: userZenmuxModel || "deepseek-chat",
+      systemInstruction,
+      userPrompt
+    });
+  } else if (aiProvider === "custom") {
+    if (!userCustomApiKey) throw new Error("Missing Custom API Key");
+    return callOpenAiCompatible({
+      apiKey: userCustomApiKey,
+      baseUrl: userCustomBaseUrl || "https://api.openai.com/v1",
+      model: userCustomModel || "gpt-4o-mini",
       systemInstruction,
       userPrompt
     });

@@ -96,6 +96,41 @@ export function ArticleView({
   const [noteContent, setNoteContent] = useState("");
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
 
+  const getAiHeaders = () => {
+    const hdrs: Record<string, string> = {
+      "X-Enable-AI": settings.enableAi ? "true" : "false",
+      "X-AI-Provider": settings.aiProvider,
+    };
+
+    if (settings.geminiApiKey) hdrs["X-Gemini-API-Key"] = settings.geminiApiKey;
+    if (settings.openaiApiKey) {
+      hdrs["X-OpenAI-API-Key"] = settings.openaiApiKey;
+      hdrs["X-OpenAI-Base-Url"] = settings.openaiBaseUrl || "";
+      hdrs["X-OpenAI-Model"] = settings.openaiModel || "";
+    }
+    if (settings.anthropicApiKey) {
+      hdrs["X-Anthropic-API-Key"] = settings.anthropicApiKey;
+      hdrs["X-Anthropic-Base-Url"] = settings.anthropicBaseUrl || "";
+      hdrs["X-Anthropic-Model"] = settings.anthropicModel || "";
+    }
+    if (settings.openrouterApiKey) {
+      hdrs["X-Openrouter-API-Key"] = settings.openrouterApiKey;
+      hdrs["X-Openrouter-Base-Url"] = settings.openrouterBaseUrl || "";
+      hdrs["X-Openrouter-Model"] = settings.openrouterModel || "";
+    }
+    if (settings.zenmuxApiKey) {
+      hdrs["X-Zenmux-API-Key"] = settings.zenmuxApiKey;
+      hdrs["X-Zenmux-Base-Url"] = settings.zenmuxBaseUrl || "";
+      hdrs["X-Zenmux-Model"] = settings.zenmuxModel || "";
+    }
+    if (settings.customApiKey) {
+      hdrs["X-Custom-API-Key"] = settings.customApiKey;
+      hdrs["X-Custom-Base-Url"] = settings.customBaseUrl || "";
+      hdrs["X-Custom-Model"] = settings.customModel || "";
+    }
+    return hdrs;
+  };
+
   // Load article content, reset AI features, load notes
   useEffect(() => {
     setSummary(null);
@@ -127,36 +162,6 @@ export function ArticleView({
 
     let isMounted = true;
     setIsLoadingContent(true);
-
-    const getAiHeaders = () => {
-      const hdrs: Record<string, string> = {
-        "X-Enable-AI": settings.enableAi ? "true" : "false",
-        "X-AI-Provider": settings.aiProvider,
-      };
-
-      if (settings.geminiApiKey) hdrs["X-Gemini-API-Key"] = settings.geminiApiKey;
-      if (settings.openaiApiKey) {
-        hdrs["X-OpenAI-API-Key"] = settings.openaiApiKey;
-        hdrs["X-OpenAI-Base-Url"] = settings.openaiBaseUrl || "";
-        hdrs["X-OpenAI-Model"] = settings.openaiModel || "";
-      }
-      if (settings.anthropicApiKey) {
-        hdrs["X-Anthropic-API-Key"] = settings.anthropicApiKey;
-        hdrs["X-Anthropic-Base-Url"] = settings.anthropicBaseUrl || "";
-        hdrs["X-Anthropic-Model"] = settings.anthropicModel || "";
-      }
-      if (settings.openrouterApiKey) {
-        hdrs["X-Openrouter-API-Key"] = settings.openrouterApiKey;
-        hdrs["X-Openrouter-Base-Url"] = settings.openrouterBaseUrl || "";
-        hdrs["X-Openrouter-Model"] = settings.openrouterModel || "";
-      }
-      if (settings.zenmuxApiKey) {
-        hdrs["X-Zenmux-API-Key"] = settings.zenmuxApiKey;
-        hdrs["X-Zenmux-Base-Url"] = settings.zenmuxBaseUrl || "";
-        hdrs["X-Zenmux-Model"] = settings.zenmuxModel || "";
-      }
-      return hdrs;
-    };
 
     const fetchFullText = async () => {
       try {
@@ -211,6 +216,9 @@ export function ArticleView({
     settings.zenmuxApiKey,
     settings.zenmuxBaseUrl,
     settings.zenmuxModel,
+    settings.customApiKey,
+    settings.customBaseUrl,
+    settings.customModel,
     t
   ]);
 
@@ -231,6 +239,7 @@ export function ArticleView({
       case "anthropic": return settings.anthropicApiKey;
       case "openrouter": return settings.openrouterApiKey;
       case "zenmux": return settings.zenmuxApiKey;
+      case "custom": return settings.customApiKey;
       default: return "";
     }
   };
@@ -243,33 +252,10 @@ export function ArticleView({
 
     setIsSummarizing(true);
     try {
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-        "X-Enable-AI": "true",
-        "X-AI-Provider": settings.aiProvider,
+      const headers = {
+        ...getAiHeaders(),
+        "Content-Type": "application/json"
       };
-
-      if (settings.geminiApiKey) headers["X-Gemini-API-Key"] = settings.geminiApiKey;
-      if (settings.openaiApiKey) {
-        headers["X-OpenAI-API-Key"] = settings.openaiApiKey;
-        headers["X-OpenAI-Base-Url"] = settings.openaiBaseUrl || "";
-        headers["X-OpenAI-Model"] = settings.openaiModel || "";
-      }
-      if (settings.anthropicApiKey) {
-        headers["X-Anthropic-API-Key"] = settings.anthropicApiKey;
-        headers["X-Anthropic-Base-Url"] = settings.anthropicBaseUrl || "";
-        headers["X-Anthropic-Model"] = settings.anthropicModel || "";
-      }
-      if (settings.openrouterApiKey) {
-        headers["X-Openrouter-API-Key"] = settings.openrouterApiKey;
-        headers["X-Openrouter-Base-Url"] = settings.openrouterBaseUrl || "";
-        headers["X-Openrouter-Model"] = settings.openrouterModel || "";
-      }
-      if (settings.zenmuxApiKey) {
-        headers["X-Zenmux-API-Key"] = settings.zenmuxApiKey;
-        headers["X-Zenmux-Base-Url"] = settings.zenmuxBaseUrl || "";
-        headers["X-Zenmux-Model"] = settings.zenmuxModel || "";
-      }
 
       const response = await fetch("/api/ai/summarize", {
         method: "POST",
@@ -304,33 +290,10 @@ export function ArticleView({
     setIsTranslating(true);
     setTranslationError(null);
     try {
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-        "X-Enable-AI": "true",
-        "X-AI-Provider": settings.aiProvider,
+      const headers = {
+        ...getAiHeaders(),
+        "Content-Type": "application/json"
       };
-
-      if (settings.geminiApiKey) headers["X-Gemini-API-Key"] = settings.geminiApiKey;
-      if (settings.openaiApiKey) {
-        headers["X-OpenAI-API-Key"] = settings.openaiApiKey;
-        headers["X-OpenAI-Base-Url"] = settings.openaiBaseUrl || "";
-        headers["X-OpenAI-Model"] = settings.openaiModel || "";
-      }
-      if (settings.anthropicApiKey) {
-        headers["X-Anthropic-API-Key"] = settings.anthropicApiKey;
-        headers["X-Anthropic-Base-Url"] = settings.anthropicBaseUrl || "";
-        headers["X-Anthropic-Model"] = settings.anthropicModel || "";
-      }
-      if (settings.openrouterApiKey) {
-        headers["X-Openrouter-API-Key"] = settings.openrouterApiKey;
-        headers["X-Openrouter-Base-Url"] = settings.openrouterBaseUrl || "";
-        headers["X-Openrouter-Model"] = settings.openrouterModel || "";
-      }
-      if (settings.zenmuxApiKey) {
-        headers["X-Zenmux-API-Key"] = settings.zenmuxApiKey;
-        headers["X-Zenmux-Base-Url"] = settings.zenmuxBaseUrl || "";
-        headers["X-Zenmux-Model"] = settings.zenmuxModel || "";
-      }
 
       const response = await fetch("/api/ai/translate", {
         method: "POST",

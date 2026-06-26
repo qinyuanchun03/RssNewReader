@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog.tsx";
-import { Sun, Moon, Monitor } from "lucide-react";
+import { Sun, Moon, Monitor, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 
 const PRIMARY_COLORS = [
@@ -188,23 +188,47 @@ export function AppearanceSettings({ isOpen, onClose }: AppearanceSettingsProps)
                     >
                       Zenmux
                     </Button>
+                    <Button
+                      variant={settings.aiProvider === "custom" ? "default" : "outline"}
+                      size="xs"
+                      onClick={() => updateSettings({ aiProvider: "custom" })}
+                      className="text-[10px] h-8 px-1"
+                    >
+                      自定义 / Custom
+                    </Button>
                   </div>
                 </div>
 
                 {settings.aiProvider === "gemini" && (
-                  <div className="space-y-2">
-                    <Label htmlFor="api-key" className="text-xs font-semibold">{t("appearance.gemini_api_key")}</Label>
-                    <Input
-                      id="api-key"
-                      type="password"
-                      value={settings.geminiApiKey || ""}
-                      onChange={(e) => updateSettings({ geminiApiKey: e.target.value })}
-                      placeholder="AIzaSy..."
-                      className="font-mono text-xs h-9"
-                    />
-                    <p className="text-[10px] leading-normal text-muted-foreground">
-                      {t("appearance.gemini_api_key_desc")}
-                    </p>
+                  <div className="space-y-3">
+                    <div className="space-y-1">
+                      <Label htmlFor="api-key" className="text-xs font-semibold">{t("appearance.gemini_api_key")}</Label>
+                      <Input
+                        id="api-key"
+                        type="password"
+                        value={settings.geminiApiKey || ""}
+                        onChange={(e) => updateSettings({ geminiApiKey: e.target.value })}
+                        placeholder="AIzaSy..."
+                        className="font-mono text-xs h-9"
+                      />
+                    </div>
+                    
+                    <div className="rounded-lg bg-muted/40 p-2.5 border border-dashed border-muted/80">
+                      <p className="text-[11px] font-semibold mb-1 flex items-center gap-1 text-foreground/90">
+                        🔑 获取 Gemini API 密钥
+                      </p>
+                      <p className="text-[10px] text-muted-foreground leading-normal mb-2">
+                        访问 Google AI Studio 创建您的专属 API 密钥，可享受免费或付费层级的高速访问。
+                      </p>
+                      <a
+                        href="https://aistudio.google.com/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[10px] text-primary hover:underline inline-flex items-center gap-1 font-medium bg-primary/5 hover:bg-primary/10 px-2 h-6 rounded border border-primary/20 transition-colors"
+                      >
+                        去申请 Gemini API Key <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
                   </div>
                 )}
 
@@ -221,18 +245,6 @@ export function AppearanceSettings({ isOpen, onClose }: AppearanceSettingsProps)
                         className="font-mono text-xs h-9"
                       />
                     </div>
-                    
-                    <div className="space-y-1">
-                      <Label htmlFor="openai-base" className="text-xs font-semibold">接口代理地址 (Base URL)</Label>
-                      <Input
-                        id="openai-base"
-                        type="text"
-                        value={settings.openaiBaseUrl || ""}
-                        onChange={(e) => updateSettings({ openaiBaseUrl: e.target.value })}
-                        placeholder="https://api.openai.com/v1"
-                        className="font-mono text-xs h-9"
-                      />
-                    </div>
 
                     <div className="space-y-1">
                       <Label htmlFor="openai-model" className="text-xs font-semibold">模型名称 (Model)</Label>
@@ -244,6 +256,23 @@ export function AppearanceSettings({ isOpen, onClose }: AppearanceSettingsProps)
                         placeholder="gpt-4o-mini"
                         className="font-mono text-xs h-9"
                       />
+                    </div>
+
+                    <div className="rounded-lg bg-muted/40 p-2.5 border border-dashed border-muted/80">
+                      <p className="text-[11px] font-semibold mb-1 flex items-center gap-1 text-foreground/90">
+                        🔑 获取 OpenAI API 密钥
+                      </p>
+                      <p className="text-[10px] text-muted-foreground leading-normal mb-2">
+                        登录 OpenAI 开发者平台，在 API keys 页面中创建您的密钥。需确保账户余额充足。
+                      </p>
+                      <a
+                        href="https://platform.openai.com/api-keys"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[10px] text-primary hover:underline inline-flex items-center gap-1 font-medium bg-primary/5 hover:bg-primary/10 px-2 h-6 rounded border border-primary/20 transition-colors"
+                      >
+                        去申请 OpenAI API Key <ExternalLink className="w-3 h-3" />
+                      </a>
                     </div>
                   </div>
                 )}
@@ -261,18 +290,6 @@ export function AppearanceSettings({ isOpen, onClose }: AppearanceSettingsProps)
                         className="font-mono text-xs h-9"
                       />
                     </div>
-                    
-                    <div className="space-y-1">
-                      <Label htmlFor="anthropic-base" className="text-xs font-semibold">接口地址 (Base URL)</Label>
-                      <Input
-                        id="anthropic-base"
-                        type="text"
-                        value={settings.anthropicBaseUrl || ""}
-                        onChange={(e) => updateSettings({ anthropicBaseUrl: e.target.value })}
-                        placeholder="https://api.anthropic.com"
-                        className="font-mono text-xs h-9"
-                      />
-                    </div>
 
                     <div className="space-y-1">
                       <Label htmlFor="anthropic-model" className="text-xs font-semibold">模型名称 (Model)</Label>
@@ -284,6 +301,23 @@ export function AppearanceSettings({ isOpen, onClose }: AppearanceSettingsProps)
                         placeholder="claude-3-5-sonnet-latest"
                         className="font-mono text-xs h-9"
                       />
+                    </div>
+
+                    <div className="rounded-lg bg-muted/40 p-2.5 border border-dashed border-muted/80">
+                      <p className="text-[11px] font-semibold mb-1 flex items-center gap-1 text-foreground/90">
+                        🔑 获取 Anthropic API 密钥
+                      </p>
+                      <p className="text-[10px] text-muted-foreground leading-normal mb-2">
+                        登录 Anthropic Console 开发者后台，创建或获取您的 Claude 专属 API 密钥。
+                      </p>
+                      <a
+                        href="https://console.anthropic.com/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[10px] text-primary hover:underline inline-flex items-center gap-1 font-medium bg-primary/5 hover:bg-primary/10 px-2 h-6 rounded border border-primary/20 transition-colors"
+                      >
+                        去申请 Anthropic API Key <ExternalLink className="w-3 h-3" />
+                      </a>
                     </div>
                   </div>
                 )}
@@ -301,18 +335,6 @@ export function AppearanceSettings({ isOpen, onClose }: AppearanceSettingsProps)
                         className="font-mono text-xs h-9"
                       />
                     </div>
-                    
-                    <div className="space-y-1">
-                      <Label htmlFor="openrouter-base" className="text-xs font-semibold">接口地址 (Base URL)</Label>
-                      <Input
-                        id="openrouter-base"
-                        type="text"
-                        value={settings.openrouterBaseUrl || ""}
-                        onChange={(e) => updateSettings({ openrouterBaseUrl: e.target.value })}
-                        placeholder="https://openrouter.ai/api/v1"
-                        className="font-mono text-xs h-9"
-                      />
-                    </div>
 
                     <div className="space-y-1">
                       <Label htmlFor="openrouter-model" className="text-xs font-semibold">模型名称 (Model)</Label>
@@ -324,6 +346,23 @@ export function AppearanceSettings({ isOpen, onClose }: AppearanceSettingsProps)
                         placeholder="google/gemini-2.5-flash"
                         className="font-mono text-xs h-9"
                       />
+                    </div>
+
+                    <div className="rounded-lg bg-muted/40 p-2.5 border border-dashed border-muted/80">
+                      <p className="text-[11px] font-semibold mb-1 flex items-center gap-1 text-foreground/90">
+                        🔑 获取 OpenRouter API 密钥
+                      </p>
+                      <p className="text-[10px] text-muted-foreground leading-normal mb-2">
+                        OpenRouter 聚合了全球主流 AI 模型（如 DeepSeek、Gemini、Llama 等），创建密钥后即可一键调用。
+                      </p>
+                      <a
+                        href="https://openrouter.ai/keys"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[10px] text-primary hover:underline inline-flex items-center gap-1 font-medium bg-primary/5 hover:bg-primary/10 px-2 h-6 rounded border border-primary/20 transition-colors"
+                      >
+                        去申请 OpenRouter API Key <ExternalLink className="w-3 h-3" />
+                      </a>
                     </div>
                   </div>
                 )}
@@ -341,18 +380,6 @@ export function AppearanceSettings({ isOpen, onClose }: AppearanceSettingsProps)
                         className="font-mono text-xs h-9"
                       />
                     </div>
-                    
-                    <div className="space-y-1">
-                      <Label htmlFor="zenmux-base" className="text-xs font-semibold">接口地址 (Base URL)</Label>
-                      <Input
-                        id="zenmux-base"
-                        type="text"
-                        value={settings.zenmuxBaseUrl || ""}
-                        onChange={(e) => updateSettings({ zenmuxBaseUrl: e.target.value })}
-                        placeholder="https://api.zenmux.ai/v1"
-                        className="font-mono text-xs h-9"
-                      />
-                    </div>
 
                     <div className="space-y-1">
                       <Label htmlFor="zenmux-model" className="text-xs font-semibold">模型名称 (Model)</Label>
@@ -364,6 +391,72 @@ export function AppearanceSettings({ isOpen, onClose }: AppearanceSettingsProps)
                         placeholder="deepseek-chat"
                         className="font-mono text-xs h-9"
                       />
+                    </div>
+
+                    <div className="rounded-lg bg-muted/40 p-2.5 border border-dashed border-muted/80">
+                      <p className="text-[11px] font-semibold mb-1 flex items-center gap-1 text-foreground/90">
+                        🔑 获取 Zenmux API 密钥
+                      </p>
+                      <p className="text-[10px] text-muted-foreground leading-normal mb-2">
+                        Zenmux 提供了高速、高性价比且稳定的 API 模型接入。登录 Zenmux 平台即可轻松创建 and 管理您的 API 密钥。
+                      </p>
+                      <a
+                        href="https://zenmux.ai/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[10px] text-primary hover:underline inline-flex items-center gap-1 font-medium bg-primary/5 hover:bg-primary/10 px-2 h-6 rounded border border-primary/20 transition-colors"
+                      >
+                        去申请 Zenmux API Key <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+                {settings.aiProvider === "custom" && (
+                  <div className="space-y-3">
+                    <div className="space-y-1">
+                      <Label htmlFor="custom-key" className="text-xs font-semibold">API 密钥 (API Key)</Label>
+                      <Input
+                        id="custom-key"
+                        type="password"
+                        value={settings.customApiKey || ""}
+                        onChange={(e) => updateSettings({ customApiKey: e.target.value })}
+                        placeholder="sk-..."
+                        className="font-mono text-xs h-9"
+                      />
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <Label htmlFor="custom-base" className="text-xs font-semibold">自定义接口代理地址 (Base URL)</Label>
+                      <Input
+                        id="custom-base"
+                        type="text"
+                        value={settings.customBaseUrl || ""}
+                        onChange={(e) => updateSettings({ customBaseUrl: e.target.value })}
+                        placeholder="https://api.openai.com/v1"
+                        className="font-mono text-xs h-9"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label htmlFor="custom-model" className="text-xs font-semibold">模型名称 (Model)</Label>
+                      <Input
+                        id="custom-model"
+                        type="text"
+                        value={settings.customModel || ""}
+                        onChange={(e) => updateSettings({ customModel: e.target.value })}
+                        placeholder="gpt-4o-mini"
+                        className="font-mono text-xs h-9"
+                      />
+                    </div>
+
+                    <div className="rounded-lg bg-muted/40 p-2.5 border border-dashed border-muted/80">
+                      <p className="text-[11px] font-semibold mb-1 flex items-center gap-1 text-foreground/90">
+                        🌐 自定义 OpenAI 兼容接口
+                      </p>
+                      <p className="text-[10px] text-muted-foreground leading-normal">
+                        支持任意 OpenAI 格式兼容的自定义 API 代理。您可以在上方自由填写接口地址与对应的模型名称（例如 DeepSeek、Local LLM 或其他中转服务）。
+                      </p>
                     </div>
                   </div>
                 )}
